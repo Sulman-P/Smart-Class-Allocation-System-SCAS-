@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Smart Class Allocation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-md px-4">
+        <div class="bg-white rounded-2xl shadow-xl p-8">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 rounded-full mb-4">
+                    <i class="fas fa-graduation-cap text-3xl text-indigo-600"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-slate-800">Smart Class</h1>
+                <p class="text-slate-500 mt-1">Student Allocation System</p>
+            </div>
+
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-slate-700 mb-1">
+                        Email Address
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-envelope text-slate-400"></i>
+                        </div>
+                        <input type="email" id="email" name="email" required
+                            class="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                            placeholder="admin@school.edu" />
+                    </div>
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-slate-700 mb-1">
+                        Password
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-slate-400"></i>
+                        </div>
+                        <input type="password" id="password" name="password" required
+                            class="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                            placeholder="••••••••" />
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="remember" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded" />
+                        <label for="remember" class="ml-2 block text-sm text-slate-700">
+                            Remember me
+                        </label>
+                    </div>
+                    <a href="#" class="text-sm text-indigo-600 hover:text-indigo-500">
+                        Forgot password?
+                    </a>
+                </div>
+
+                <button type="submit" id="loginBtn"
+                    class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 transition duration-200 font-medium">
+                    <span id="loginText">Sign In</span>
+                    <span id="loginSpinner" class="hidden"><i class="fas fa-spinner fa-spin"></i></span>
+                </button>
+            </form>
+
+            <div id="loginError" class="mt-4 hidden">
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    <span id="errorMessage">Invalid credentials</span>
+                </div>
+            </div>
+
+            <div class="mt-6 text-center">
+                <p class="text-sm text-slate-500">
+                    Demo credentials: <span class="font-mono text-slate-700">admin@nhs.edu</span>
+                    <span class="mx-2">/</span>
+                    <span class="font-mono text-slate-700">password123</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+    <script src="/js/auth.js"></script>
+</body>
+</html>
