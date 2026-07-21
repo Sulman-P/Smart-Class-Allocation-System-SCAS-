@@ -101,7 +101,7 @@ if uploaded_file is not None:
             # --- ITERATIVE BOARDER BALANCE & MARKS CONSTRAINT ENFORCER ---
             # Runs fine-tuning loops to shift boarders where variance across any stream exceeds 2 students
             for _ in range(500):
-                counts = {s: sum(1 for x in assigned_data[s] if str(x['Status']).strip().lower() == 'boarder') for s in stream_names}
+                counts = {s: sum(1 for x in assigned_data[s] if str(x.get('Status', '')).strip().lower() == 'boarder') for s in stream_names}
                 max_b_stream = max(counts, key=counts.get)
                 min_b_stream = min(counts, key=counts.get)
                 
@@ -109,8 +109,12 @@ if uploaded_file is not None:
                 if counts[max_b_stream] - counts[min_b_stream] <= 2:
                     break
                 
-                max_stream_boarders = [x for x in assigned_data[max_b_stream] if str(x['Status']).strip().lower() == 'boarder']
-                min_stream_day = [x for x in assigned_data[min_b_stream] if str(x['Status']).strip().lower() != 'boarder']
+                max_stream_boarders = [x for x in assigned_data[max_b_stream] if str(x.get('Status', '')).strip().lower() == 'boarder']
+                min_stream_day = [x for x in assigned_data[min_b_stream] if str(x.get('Status', '')).strip().lower() != 'boarder']
+                
+                # Skip if no candidates for swap
+                if not max_stream_boarders or not min_stream_day:
+                    break
                 
                 best_swap = None
                 best_score_diff_impact = float('inf')
@@ -118,9 +122,25 @@ if uploaded_file is not None:
                 # Double loop to look for paired candidates with the smallest academic distance
                 for b_stud in max_stream_boarders:
                     for d_stud in min_stream_day:
+                        # Safe extraction of student IDs
+                        b_id = b_stud.get('Student ID')
+                        d_id = d_stud.get('Student ID')
+                        
                         # Simulated temporary swap impact checks
-                        sim_avg_max = np.mean([x['Academic Score'] if x['Student ID'] != b_stud['Student ID'] else d_stud['Academic Score'] for x in assigned_data[max_b_stream]])
-                        sim_avg_min = np.mean([x['Academic Score'] if x['Student ID'] != d_stud['Student ID'] else b_stud['Academic Score'] for x in assigned_data[min_b_stream]])
+                        # Get current averages
+                        max_avg = np.mean([x['Academic Score'] for x in assigned_data[max_b_stream]])
+                        min_avg = np.mean([x['Academic Score'] for x in assigned_data[min_b_stream]])
+                        
+                        # Calculate new averages after swap
+                        # For max_b_stream: remove b_stud, add d_stud
+                        new_max_scores = [x['Academic Score'] for x in assigned_data[max_b_stream] if x.get('Student ID') != b_id]
+                        new_max_scores.append(d_stud['Academic Score'])
+                        sim_avg_max = np.mean(new_max_scores)
+                        
+                        # For min_b_stream: remove d_stud, add b_stud
+                        new_min_scores = [x['Academic Score'] for x in assigned_data[min_b_stream] if x.get('Student ID') != d_id]
+                        new_min_scores.append(b_stud['Academic Score'])
+                        sim_avg_min = np.mean(new_min_scores)
                         
                         # Fetch global boundary boundaries to prevent any single stream escaping limits
                         all_current_averages = []
@@ -135,22 +155,30 @@ if uploaded_file is not None:
                         sim_global_range = max(all_current_averages) - min(all_current_averages)
                         
                         # Keep trade window open if marks variation stays safely under 2.0
-                        if sim_global_range < 1.95 and abs(b_stud['Academic Score'] - d_stud['Academic Score']) < best_score_diff_impact:
-                            best_score_diff_impact = abs(b_stud['Academic Score'] - d_stud['Academic Score'])
+                        score_diff = abs(b_stud['Academic Score'] - d_stud['Academic Score'])
+                        if sim_global_range < 1.95 and score_diff < best_score_diff_impact:
+                            best_score_diff_impact = score_diff
                             best_swap = (b_stud, d_stud)
                 
                 if best_swap:
                     b_stud, d_stud = best_swap
-                    assigned_data[max_b_stream].remove(b_stud)
-                    assigned_data[min_b_stream].remove(d_stud)
+                    b_id = b_stud.get('Student ID')
+                    d_id = d_stud.get('Student ID')
                     
+                    # Remove students from current streams
+                    assigned_data[max_b_stream] = [x for x in assigned_data[max_b_stream] if x.get('Student ID') != b_id]
+                    assigned_data[min_b_stream] = [x for x in assigned_data[min_b_stream] if x.get('Student ID') != d_id]
+                    
+                    # Add swapped students
                     assigned_data[max_b_stream].append(d_stud)
                     assigned_data[min_b_stream].append(b_stud)
                 else:
                     break 
 
             # 3. Unbiased Teacher Assignment
-            selected_teachers = random.sample(teacher_list, num_streams)
+            # Shuffle teachers before assignment
+            random.shuffle(teacher_list)
+            selected_teachers = teacher_list[:num_streams]  # Take only needed number
             teacher_mapping = {stream_names[i]: selected_teachers[i] for i in range(num_streams)}
             
             # --- GENERATING THE DASHBOARD REPORT ---
@@ -165,7 +193,7 @@ if uploaded_file is not None:
                     final_streams_dfs[stream] = stream_students
                     
                     total_students = len(stream_students)
-                    avg_score = round(stream_students['Academic Score'].mean(), 2)
+                    avg_score = round(stream_students['Academic Score'].mean(), 2) if total_students > 0 else 0
                     male_count = len(stream_students[stream_students['Gender'] == 'M'])
                     female_count = len(stream_students[stream_students['Gender'] == 'F'])
                     boarder_count = len(stream_students[stream_students['Status'].str.lower() == 'boarder'])
@@ -176,7 +204,7 @@ if uploaded_file is not None:
                 
                 summary_data.append({
                     "Stream": stream,
-                    "Class Teacher": teacher_mapping[stream],
+                    "Class Teacher": teacher_mapping.get(stream, "Not Assigned"),
                     "Total Students": total_students,
                     "Avg Academic Score": avg_score,
                     "Male Count": male_count,
@@ -186,8 +214,8 @@ if uploaded_file is not None:
                 })
                 
             summary_df = pd.DataFrame(summary_data)
-            score_variance = round(summary_df["Avg Academic Score"].max() - summary_df["Avg Academic Score"].min(), 2)
-            boarder_variance = summary_df["Boarder Count"].max() - summary_df["Boarder Count"].min()
+            score_variance = round(summary_df["Avg Academic Score"].max() - summary_df["Avg Academic Score"].min(), 2) if not summary_df.empty else 0
+            boarder_variance = summary_df["Boarder Count"].max() - summary_df["Boarder Count"].min() if not summary_df.empty else 0
             
             # Dashboard Presentation
             st.header("📊 Reshuffle Performance Dashboard")
@@ -198,3 +226,41 @@ if uploaded_file is not None:
                     st.success(f"🎯 Academic Mark Variance: **{score_variance} marks** (Target met: < 2.0)")
                 else:
                     st.warning(f"⚠️ Academic Mark Variance: **{score_variance} marks** (Slightly compromised to protect boarding parity)")
+            
+            with col2:
+                if boarder_variance <= 2:
+                    st.success(f"🏠 Boarder Count Variance: **{boarder_variance} students** (Target met: ≤ 2)")
+                else:
+                    st.warning(f"⚠️ Boarder Count Variance: **{boarder_variance} students** (Target not met)")
+            
+            # Display Summary Table
+            st.subheader("📋 Stream Summary")
+            st.dataframe(summary_df, use_container_width=True)
+            
+            # Display Individual Streams
+            st.subheader("📚 Individual Stream Details")
+            for stream in stream_names:
+                with st.expander(f"📖 {stream} - {teacher_mapping.get(stream, 'No Teacher')}"):
+                    if not final_streams_dfs[stream].empty:
+                        st.dataframe(final_streams_dfs[stream], use_container_width=True)
+                    else:
+                        st.info(f"No students assigned to {stream}")
+            
+            # Download Button for Results
+            with pd.ExcelWriter('reshuffled_students.xlsx', engine='xlsxwriter') as writer:
+                summary_df.to_excel(writer, sheet_name='Summary', index=False)
+                for stream, df_stream in final_streams_dfs.items():
+                    if not df_stream.empty:
+                        df_stream.to_excel(writer, sheet_name=stream, index=False)
+            
+            with open('reshuffled_students.xlsx', 'rb') as f:
+                st.download_button(
+                    label="📥 Download Reshuffled Data (Excel)",
+                    data=f,
+                    file_name="reshuffled_students.xlsx",
+                    mime="application/vnd.ms-excel"
+                )
+                
+    except Exception as e:
+        st.error(f"❌ An error occurred: {str(e)}")
+        st.exception(e)  # This will show the full traceback in development
