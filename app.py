@@ -7,7 +7,7 @@ import random
 # Page Configuration
 st.set_page_config(page_title="Dynamic Student Reshuffling System", page_icon="🏫", layout="wide")
 
-st.title("🏫 Dynamic Student Reshuffling & Allocation System")
+st.title("🏫 Kenyavault Student Reshuffling & Allocation System")
 st.markdown("This system utilizes a **Multi-Constraint Optimization Engine** to guarantee a class average variance under 2 marks, while ensuring the difference in Boarder counts across any two streams is 2 or fewer students.")
 
 # --- SIDEBAR: SYSTEM CONFIGURATION ---
