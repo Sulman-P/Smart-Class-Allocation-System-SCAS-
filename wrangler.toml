@@ -1,8 +1,0 @@
-name = "smart-class-allocation-frontend"
-type = "pages"
-
-[build]
-command = "cp -r . /output"
-
-[[pages]]
-binding = "ASSETS"
