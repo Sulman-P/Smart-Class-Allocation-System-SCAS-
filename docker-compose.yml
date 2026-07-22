@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  streamlit-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kenyavault-reshuffling
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    environment:
+      - STREAMLIT_SERVER_ENABLE_FILE_WATCHER=false
+      - STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+      - STREAMLIT_CLIENT_SHOW_ERROR_DETAILS=false
+      - STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION=true
+      - STREAMLIT_TOOLBAR_MODE=minimal
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+      - ./app.py:/app/app.py
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - kenyavault-network
+
+  # Optional: Add Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: kenyavault-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - streamlit-app
+    networks:
+      - kenyavault-network
+
+networks:
+  kenyavault-network:
+    driver: bridge
