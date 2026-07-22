@@ -1,31 +1,48 @@
+# .streamlit/config.toml
+
 [theme]
 base = "light"
 primaryColor = "#D4A017"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F8F9FA"
+textColor = "#0A1A3A"
+font = "sans serif"
 
 [server]
-# Run in production mode
+# Production server settings
 runOnSave = false
 enableXsrfProtection = true
 enableCORS = false
+enableWebsocketCompression = true
 maxUploadSize = 200
+maxMessageSize = 200
+port = 8501
+headless = true
 
 [browser]
-# Hide the deploy button
 gatherUsageStats = false
+serverAddress = "kenyavault.co.ke"
+serverPort = 8501
 
 [logger]
 level = "error"
 
-# Disable the "Edit" button
 [client]
 showErrorDetails = false
 toolbarMode = "minimal"
 
-# Hide the "Run" button
 [runner]
 fastReruns = false
 
-# Security settings
-[server]
-# Prevent access to app.py
-enableStaticServing = false
+[global]
+developmentMode = false
+
+[mapbox]
+token = ""
+
+[deprecation]
+showfileUploaderEncoding = false
+showImageFormats = false
+
+[ui]
+hideTopBar = true
