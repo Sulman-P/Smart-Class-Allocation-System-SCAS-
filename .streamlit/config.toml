@@ -1,0 +1,31 @@
+[theme]
+base = "light"
+primaryColor = "#D4A017"
+
+[server]
+# Run in production mode
+runOnSave = false
+enableXsrfProtection = true
+enableCORS = false
+maxUploadSize = 200
+
+[browser]
+# Hide the deploy button
+gatherUsageStats = false
+
+[logger]
+level = "error"
+
+# Disable the "Edit" button
+[client]
+showErrorDetails = false
+toolbarMode = "minimal"
+
+# Hide the "Run" button
+[runner]
+fastReruns = false
+
+# Security settings
+[server]
+# Prevent access to app.py
+enableStaticServing = false
