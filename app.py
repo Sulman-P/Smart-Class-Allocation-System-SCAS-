@@ -1,6 +1,9 @@
 # ==================== PAGE CONFIGURATION (MUST BE FIRST) ====================
 import streamlit as st
+import os
+import sys
 
+# Force production mode - must be first
 st.set_page_config(
     page_title="Dynamic Student Reshuffling System | KenyaVault",
     page_icon="🏫",
@@ -8,42 +11,123 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ==================== PROTECTION (AFTER PAGE CONFIG) ====================
-# Hide all edit capabilities
+# ==================== PRODUCTION MODE SETTINGS ====================
+# Set environment variables for production
+os.environ['STREAMLIT_SERVER_ENABLE_FILE_WATCHER'] = 'false'
+os.environ['STREAMLIT_BROWSER_GATHER_USAGE_STATS'] = 'false'
+os.environ['STREAMLIT_CLIENT_SHOW_ERROR_DETAILS'] = 'false'
+os.environ['STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION'] = 'true'
+os.environ['STREAMLIT_TOOLBAR_MODE'] = 'minimal'
+
+# ==================== COMPLETE UI PROTECTION ====================
 st.markdown("""
 <style>
+    /* HIDE ALL UI ELEMENTS THAT ALLOW EDITING */
     #MainMenu {visibility: hidden !important;}
     .stDeployButton {display: none !important;}
     header {display: none !important;}
     .stAppDeployButton {display: none !important;}
     [data-testid="stToolbar"] {display: none !important;}
     [data-testid="stDecoration"] {display: none !important;}
+    .stAppViewContainer > header {display: none !important;}
+    .stApp > header {display: none !important;}
     
-    /* Disable right-click */
+    /* Hide the settings cog */
+    .st-emotion-cache-1avcm0n {display: none !important;}
+    
+    /* Disable right-click completely */
     * {
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
+        -webkit-user-select: none !important;
+        -webkit-touch-callout: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
+        user-select: none !important;
+        -webkit-tap-highlight-color: transparent !important;
+    }
+    
+    /* Hide scrollbars in a clean way */
+    ::-webkit-scrollbar {width: 6px;}
+    ::-webkit-scrollbar-track {background: #f1f1f1;}
+    ::-webkit-scrollbar-thumb {background: #D4A017; border-radius: 3px;}
+    ::-webkit-scrollbar-thumb:hover {background: #FCD34D;}
+    
+    /* Make app full width */
+    .stApp {
+        max-width: 100% !important;
+        padding: 0 !important;
+    }
+    
+    /* Remove padding from main container */
+    .st-emotion-cache-1r6slb0 {
+        padding: 1rem 2rem !important;
+    }
+    
+    /* Custom loading spinner */
+    .stSpinner {
+        border-color: #D4A017 !important;
     }
 </style>
 
 <script>
-    // Block right-click
+    // Block all right-click events
     document.addEventListener('contextmenu', function(e) {
         e.preventDefault();
+        e.stopPropagation();
         return false;
-    });
+    }, true);
     
-    // Block keyboard shortcuts
+    // Block all keyboard shortcuts for viewing source
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'F12' || 
-            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) ||
-            (e.ctrlKey && e.key === 'u')) {
+        // Block F12
+        if (e.key === 'F12' || e.keyCode === 123) {
             e.preventDefault();
+            e.stopPropagation();
             return false;
         }
-    });
+        // Block Ctrl+Shift+I (DevTools)
+        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.keyCode === 73)) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+        // Block Ctrl+U (View Source)
+        if (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+        // Block Ctrl+Shift+J (Console)
+        if (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j' || e.keyCode === 74)) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+        // Block Ctrl+S (Save)
+        if (e.ctrlKey && (e.key === 's' || e.key === 'S' || e.keyCode === 83)) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+        return true;
+    }, true);
+    
+    // Disable drag and drop on images
+    document.addEventListener('dragstart', function(e) {
+        e.preventDefault();
+        return false;
+    }, true);
+    
+    // Disable text selection via mouse
+    document.addEventListener('selectstart', function(e) {
+        e.preventDefault();
+        return false;
+    }, true);
+    
+    // Override console.log to prevent debugging
+    console.log = function() {};
+    console.warn = function() {};
+    console.error = function() {};
+    console.info = function() {};
 </script>
 """, unsafe_allow_html=True)
 
@@ -641,8 +725,10 @@ if uploaded_file is not None:
                 st.balloons()
                 
     except Exception as e:
-        st.error(f"❌ An error occurred: {str(e)}")
-        st.exception(e)  # This will show the full traceback in development
+        # In production, show a generic error message
+        st.error("❌ An error occurred while processing your request. Please try again or contact support.")
+        # Log the error (don't show to users in production)
+        print(f"Error: {str(e)}")
 
 # ==================== FOOTER ====================
 st.markdown("---")
