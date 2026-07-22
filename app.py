@@ -1,3 +1,13 @@
+# At the very top of app.py
+st.set_page_config(...)
+
+st.markdown("""
+<style>
+    #MainMenu {visibility: hidden !important;}
+    .stDeployButton {display: none !important;}
+    header {display: none !important;}
+</style>
+""", unsafe_allow_html=True)
 import streamlit as st
 import pandas as pd
 import numpy as np
