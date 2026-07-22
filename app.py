@@ -160,7 +160,7 @@ st.markdown("""
         "I used to spend days manually balancing classes. Now I just upload an Excel file 
         and get perfectly balanced classes in minutes!" 
     </p>
-    <p style="font-weight: bold;">— Head Teacher, Nairobi School</p>
+    <p style="font-weight: bold;">— Head Teacher, Nairobi</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -307,37 +307,40 @@ teacher_list = [t.strip() for t in teachers_input.split("\n") if t.strip()]
 # ==================== USER REGISTRATION ====================
 st.sidebar.markdown("---")
 st.sidebar.header("📧 Get Updates")
-with st.sidebar.form("user_registration"):
-    user_name = st.sidebar.text_input("Your Name")
-    user_email = st.sidebar.text_input("Email Address")
-    school_name = st.sidebar.text_input("School Name (Optional)")
-    submit_btn = st.sidebar.form_submit_button("Subscribe")
-    
-    if submit_btn and user_email:
-        try:
-            # Create data directory if it doesn't exist
-            data_dir = 'data'
-            if not os.path.exists(data_dir):
-                os.makedirs(data_dir)
-            
-            new_user = pd.DataFrame({
-                'Name': [user_name],
-                'Email': [user_email],
-                'School': [school_name],
-                'Date': [pd.Timestamp.now()]
-            })
-            
-            csv_path = os.path.join(data_dir, 'subscribers.csv')
+
+# Create form in sidebar properly
+with st.sidebar:
+    with st.form("user_registration"):
+        user_name = st.text_input("Your Name")
+        user_email = st.text_input("Email Address")
+        school_name = st.text_input("School Name (Optional)")
+        submit_btn = st.form_submit_button("Subscribe")
+        
+        if submit_btn and user_email:
             try:
-                existing = pd.read_csv(csv_path)
-                updated = pd.concat([existing, new_user], ignore_index=True)
-            except FileNotFoundError:
-                updated = new_user
-            
-            updated.to_csv(csv_path, index=False)
-            st.sidebar.success("✅ Subscribed! We'll keep you updated.")
-        except Exception as e:
-            st.sidebar.error("❌ Could not subscribe. Please try again.")
+                # Create data directory if it doesn't exist
+                data_dir = 'data'
+                if not os.path.exists(data_dir):
+                    os.makedirs(data_dir)
+                
+                new_user = pd.DataFrame({
+                    'Name': [user_name],
+                    'Email': [user_email],
+                    'School': [school_name],
+                    'Date': [pd.Timestamp.now()]
+                })
+                
+                csv_path = os.path.join(data_dir, 'subscribers.csv')
+                try:
+                    existing = pd.read_csv(csv_path)
+                    updated = pd.concat([existing, new_user], ignore_index=True)
+                except FileNotFoundError:
+                    updated = new_user
+                
+                updated.to_csv(csv_path, index=False)
+                st.success("✅ Subscribed! We'll keep you updated.")
+            except Exception as e:
+                st.error("❌ Could not subscribe. Please try again.")
 
 # ==================== PRICING SECTION ====================
 st.sidebar.markdown("---")
