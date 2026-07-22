@@ -613,7 +613,54 @@ if uploaded_file is not None:
     except Exception as e:
         st.error(f"❌ An error occurred: {str(e)}")
         st.exception(e)  # This will show the full traceback in development
+ # Completely hide the app.py from being viewed
+import streamlit as st
+import os
 
+# Disable the view source option
+if os.environ.get('STREAMLIT_SHOW_SOURCE') is None:
+    os.environ['STREAMLIT_SHOW_SOURCE'] = 'false'
+
+# Hide the menu and edit options
+st.markdown("""
+<style>
+    /* Full protection mode */
+    #MainMenu {visibility: hidden !important;}
+    .stDeployButton {display: none !important;}
+    header {display: none !important;}
+    .stAppDeployButton {display: none !important;}
+    [data-testid="stToolbar"] {display: none !important;}
+    [data-testid="stDecoration"] {display: none !important;}
+    
+    /* Block right-click */
+    * {
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+</style>
+
+<script>
+    // Block right-click
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        return false;
+    });
+    
+    // Block keyboard shortcuts (Ctrl+U, Ctrl+Shift+I, F12)
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'F12' || 
+            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) ||
+            (e.ctrlKey && e.key === 'u') ||
+            (e.ctrlKey && e.shiftKey && e.key === 'J')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+</script>
+""", unsafe_allow_html=True)
 # ==================== FOOTER ====================
 st.markdown("---")
 st.markdown("""
