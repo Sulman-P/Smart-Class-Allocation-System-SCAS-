@@ -47,41 +47,6 @@ st.markdown("""
 </script>
 """, unsafe_allow_html=True)
 
-# ==================== OPTIONAL PASSWORD PROTECTION ====================
-# Uncomment the following block to enable password protection:
-"""
-def check_password():
-    \"\"\"Returns True if user has entered the correct password\"\"\"
-    if "password_correct" not in st.session_state:
-        st.session_state.password_correct = False
-    
-    if st.session_state.password_correct:
-        return True
-    
-    # Show login form
-    st.markdown("""
-    <div style="text-align: center; padding: 80px 20px;">
-        <h1 style="color: #D4A017;">🔐 KenyaVault Stream Balancer</h1>
-        <p style="color: #666;">Enter access password to continue</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        password = st.text_input("Password", type="password", placeholder="Enter password...")
-        if st.button("🔓 Unlock Tool", use_container_width=True):
-            if password == "KenyaVault2026!":  # CHANGE THIS PASSWORD
-                st.session_state.password_correct = True
-                st.rerun()
-            else:
-                st.error("❌ Incorrect password. Please try again.")
-    return False
-
-# Uncomment the next line to enable password protection:
-# if not check_password():
-#     st.stop()
-"""
-
 # ==================== IMPORTS ====================
 import pandas as pd
 import numpy as np
