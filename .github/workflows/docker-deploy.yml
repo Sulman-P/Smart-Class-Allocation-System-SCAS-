@@ -1,0 +1,47 @@
+name: Build and Deploy Docker Image
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Login to DockerHub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        push: true
+        tags: |
+          ${{ secrets.DOCKER_USERNAME }}/kenyavault-reshuffling:latest
+          ${{ secrets.DOCKER_USERNAME }}/kenyavault-reshuffling:${{ github.sha }}
+        cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/kenyavault-reshuffling:buildcache
+        cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/kenyavault-reshuffling:buildcache,mode=max
+    
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        script: |
+          cd /opt/kenyavault-reshuffling
+          docker-compose down
+          docker pull ${{ secrets.DOCKER_USERNAME }}/kenyavault-reshuffling:latest
+          docker-compose up -d
