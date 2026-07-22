@@ -9,7 +9,7 @@ from io import BytesIO
 
 # ==================== PAGE CONFIGURATION ====================
 st.set_page_config(
-    page_title="Dynamic Student Reshuffling System | KenyaVault",
+    page_title="KenyaVault Student Reshuffling System | KenyaVault",
     page_icon="🏫",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -119,7 +119,7 @@ st.markdown("""
 
 # ==================== WHATSAPP FLOAT BUTTON ====================
 st.markdown("""
-<a href="https://wa.me/254700000000?text=Hi%20I%20need%20help%20with%20the%20student%20reshuffling%20tool" 
+<a href="https://wa.me/254768515494?text=Hi%20I%20need%20help%20with%20the%20student%20reshuffling%20tool" 
    class="whatsapp-float" target="_blank">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="35" height="35">
         <path fill="#fff" d="M4.868,43.303l2.694-9.835C5.9,30.59,5.026,27.324,5.027,23.979C5.032,13.514,13.548,5,24.014,5c5.079,0.002,9.845,1.979,13.43,5.566c3.584,3.588,5.558,8.356,5.556,13.428c-0.004,10.465-8.522,18.98-18.986,18.98c-0.001,0,0,0,0,0h-0.008c-3.177-0.001-6.3-0.798-9.073-2.311L4.868,43.303z"/>
@@ -347,12 +347,12 @@ st.sidebar.markdown("""
 - 🎯 Full version: All features
 
 **Upgrade Options:**
-- 💰 One-time: KSh 5,000
-- 📅 Annual: KSh 2,500/year
-- 🏫 School Package: KSh 15,000
+- 💰 One-time: KSh 4,000
+- 📅 Annual: KSh 1,500/year
+- 🏫 School Package: KSh 6,000
 
-📞 Call: 07XX XXX XXX  
-📧 Email: support@kenyavault.co.ke
+📞 Call: 0768 515 494  
+📧 Email: adminnexalearn@gmail.com
 """)
 
 # ==================== MAIN PAGE: DATA INPUT ====================
