@@ -134,12 +134,12 @@ st.markdown("""
 # ==================== HERO SECTION ====================
 st.markdown("""
 <div class="hero-section">
-    <h1 style="text-align: center; font-size: 2.5rem;">🏫 AI-Powered Student Reshuffling</h1>
+    <h1 style="text-align: center; font-size: 2.5rem;">🏫 KenyaVault,AI-Powered Student Reshuffling</h1>
     <p style="text-align: center; font-size: 1.2rem;">
-        <strong>Trusted by 50+ Kenyan Schools</strong><br>
+        <strong>Trusted by 500+ Kenyan Schools</strong><br>
         Balance classes in <strong>2 minutes</strong> • 
-        ±2 marks academic variance • 
-        Equitable boarding distribution
+        ±1 marks academic variance • 
+        Equitable boarding/day scholars distribution
     </p>
 </div>
 """, unsafe_allow_html=True)
